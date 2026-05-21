@@ -25,4 +25,11 @@ urlpatterns = [
     path("tasks/", views.tasks),
     path("about/", views.about),
     path("user/<int:id>/", views.user_detail),
+    path("contacts/", views.contacts),
+    path("hello/<str:name>/", views.hello),
+    path("number/<int:num>/", views.number),
+    path("sum/<int:num1>/<int:num2>/", views.sum),
+    path("maximum/<int:num1>/<int:num2>/", views.maximum),
+    path("tasks/<int:index>/", views.get_task),
+    path("tasks/longest/", views.tasks_long),
 ]

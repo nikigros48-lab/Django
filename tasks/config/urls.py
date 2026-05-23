@@ -30,6 +30,11 @@ urlpatterns = [
     path("number/<int:num>/", views.number),
     path("sum/<int:num1>/<int:num2>/", views.sum),
     path("maximum/<int:num1>/<int:num2>/", views.maximum),
-    path("tasks/<int:index>/", views.get_task),
+    path("tasks/<int:id>/", views.get_task),
     path("tasks/longest/", views.tasks_long),
+    path("tasks/completed/", views.completed_tasks),
+    path("tasks/not-done/", views.not_done_tasks),
+    path("tasks/create/", views.create_task),
+    path("tasks/<int:id>/delete/", views.delete_task),
+    path("tasks/<int:id>/complete/", views.complete_task),
 ]

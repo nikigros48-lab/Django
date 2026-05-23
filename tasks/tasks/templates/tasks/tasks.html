@@ -11,18 +11,19 @@
         <p>У вас есть следующие задачи:</p>
         {% for task in tasks %}
             <p>
-                {{forloop.counter}}. {{task.title}} 
+                {{forloop.counter}}. <a href="/tasks/{{ task.id }}/" style="text-decoration: none; color: black;">{{task.title}}</a>
                 {% if task.completed %}
-                    [✅]
+                    ✅
                 {% else %}
-                    [❌]
+                    ❌
                 {% endif %}
-                (Приоритет: {{task.priority}})
+                ({{task.priority}})
             </p>
         {% endfor %}
     {% else %}
         <p>У вас нет задач!</p>
     {% endif %}
+    <a href="/tasks/create/">Создать новую задачу</a>
     
 </body>
 </html>

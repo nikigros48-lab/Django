@@ -9,7 +9,12 @@
     <h1>Информация о задаче "{{ task.title }}"</h1>
     <p>Приоритет: {{ task.priority }}</p>
     <p>Статус: {% if task.completed %}Завершена{% else %}Незавершена{% endif %}</p>
-    <a href="/tasks/{{ task.id}}/complete">Завершить задачу</a><br>
+    {% if task.completed %}
+        <a href="/tasks/{{ task.id}}/switch-status/">Отметить невыполненной</a>
+    {% else %}
+        <a href="/tasks/{{ task.id}}/switch-status/">Отметить выполненной</a>
+    {% endif %}
+    <br>
     <a href="/tasks/{{ task.id }}/delete/">Удалить задачу</a><br>
     <a href="/tasks/">Назад к списку задач</a>
 </body>

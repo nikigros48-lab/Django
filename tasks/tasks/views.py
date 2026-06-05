@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Task
+from .forms import TaskForm
 
 
 
@@ -53,17 +54,39 @@ def create_task(request:HttpRequest):
     error = None
     if request.method == "POST":
         title = request.POST.get("title")
-        priority = request.POST.get("priority")
-        if priority is None or priority == '':
-            priority = 1
-        else:
-            priority = int(priority)
+        priority = int(request.POST.get("priority", 1))
         if title:
             Task.objects.create(title=title, priority=priority)
             return redirect("/tasks/")
         else:
             error = "Название задачи не может быть пустым!"
     return render(request, "tasks/tasks_create.html", context={"error": error})
+
+
+def edit_task(request:HttpRequest, id:int):
+    task = get_object_or_404(Task, id=id)
+    if request.method == "POST":
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            task.title = form.cleaned_data["title"]
+            task.priority = form.cleaned_data["priority"]
+            task.save()
+            return redirect(f"/tasks/{id}/")
+    else:
+        form = TaskForm(initial={"title": task.title, "priority": task.priority})
+    return render(request, "tasks/task_edit.html", context={"form": form})
+
+
+def search_tasks(request:HttpRequest):
+    title = request.GET.get("title")
+    priority = request.GET.get("priority")
+    priority = int(priority) if priority else None
+    tasks = Task.objects.all() if title or priority else []
+    if title:
+        tasks = tasks.filter(title__icontains=title)
+    if priority:
+        tasks = tasks.filter(priority=priority)
+    return render(request, "tasks/search_task.html", context={"tasks": tasks, "word": title, "priority": priority})
 
 
 def delete_task(request:HttpRequest, id:int):
@@ -83,10 +106,7 @@ def delete_completed_tasks(request:HttpRequest):
 
 def switch_status_task(request:HttpRequest, id:int):
     task = get_object_or_404(Task, id=id)
-    if task.completed:
-        task.completed = False
-    else:
-        task.completed = True
+    task.completed = not task.completed
     task.save()
     return redirect(f"/tasks/{id}/")
 
@@ -96,7 +116,6 @@ def statistics(request:HttpRequest):
     total_tasks = len(list_tasks)
     len_completed = len([task for task in list_tasks if task.completed])
     len_not_completed = total_tasks - len_completed
-    response = [f"Всего задач: {total_tasks}", f"Завершенных: {len_completed}", f"Незавершенных: {len_not_completed}"]
-    return HttpResponse("<br>".join(response))
+    return HttpResponse("<br>".join([f"Всего задач: {total_tasks}", f"Завершенных: {len_completed}", f"Незавершенных: {len_not_completed}"]))
 
 

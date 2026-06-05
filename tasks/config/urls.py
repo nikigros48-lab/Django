@@ -35,4 +35,6 @@ urlpatterns = [
     path("tasks/stats/", views.statistics),
     path("tasks/delete-completed/", views.delete_completed_tasks),
     path("tasks/search/<str:word>/", views.search_tasks),
+    path("tasks/<int:id>/edit/", views.edit_task),
+    path("tasks/search/", views.search_tasks),
 ]

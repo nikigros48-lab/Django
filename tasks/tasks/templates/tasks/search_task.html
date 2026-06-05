@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Tasks</title>
+</head>
+<body>
+    <form method="get">
+        <input type="text" name="title" placeholder="Search by title">
+        <input type="number" name="priority" placeholder="Search by priority">
+        <button type="submit">Найти</button>
+    </form>
+    {% if word or priority %}
+        <p>Результаты поиска для {% if word %}"{{ word }}"{% endif %}{% if priority %} (приоритет: {{ priority }}){% endif %}:</p>
+        {% if tasks %}
+            {% for task in tasks %}
+                <a href="/tasks/{{ task.id }}/">{{ task.title }}</a><br>
+            {% endfor %}
+        {% else %}
+            <p>Ничего не найдено.</p>
+        {% endif %}
+    {% endif %}
+    
+    
+</body>
+</html>

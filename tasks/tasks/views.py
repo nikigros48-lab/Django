@@ -40,33 +40,31 @@ def tasks(request:HttpRequest):
 
 @login_required
 def get_task(request:HttpRequest, id:int):
-    task = get_object_or_404(Task, id=id)
+    task = get_object_or_404(Task, id=id, user=request.user)
     return render(request, "tasks/task_info.html", context={"task": task})
 
 
 @login_required
 def search_task(request:HttpRequest, word:str):
-    list_tasks = Task.objects.filter(title__icontains=word)
+    list_tasks = Task.objects.filter(title__icontains=word, user=request.user)
     return HttpResponse(f"Задачи, содержащие '{word}':<br> {'<br>'.join({task.title for task in list_tasks})}")
 
 
 @login_required
 def longest_task(request:HttpRequest):
-    list_tasks = Task.objects.all()
-    longest_task = max(list_tasks, key=lambda task: len(task.title))
+    longest_task = max(Task.objects.filter(user=request.user), key=lambda task: len(task.title))
     return HttpResponse(f"{longest_task.title} - самая длинная задача!")
 
 
 @login_required
 def completed_tasks(request:HttpRequest):
-    list_completed = Task.objects.filter(completed=True)
-    return HttpResponse(f"Завершенные задачи:<br> {"<br>".join(task.title for task in list_completed)}")
+    completed = Task.objects.filter(completed=True, user=request.user)
+    return HttpResponse(f"Завершенные задачи:<br> {"<br>".join(task.title for task in completed)}")
 
 
 @login_required
 def not_completed_tasks(request:HttpRequest):
-    list_tasks = Task.objects.all()
-    not_completed = [task for task in list_tasks if not task.completed]
+    not_completed = Task.objects.filter(completed=False, user=request.user)
     return HttpResponse(f"Незавершенные задачи:<br> {"<br>".join(task.title for task in not_completed)}")
 
 
@@ -102,7 +100,7 @@ def search_tasks(request:HttpRequest):
     title = request.GET.get("title")
     priority = request.GET.get("priority")
     priority = int(priority) if priority else None
-    tasks = Task.objects.all() if title or priority else []
+    tasks = Task.objects.filter(user=request.user) if title or priority else []
     if title:
         tasks = tasks.filter(title__icontains=title)
     if priority:
@@ -112,7 +110,7 @@ def search_tasks(request:HttpRequest):
 
 @login_required
 def delete_task(request:HttpRequest, id:int):
-    task = get_object_or_404(Task, id=id)
+    task = get_object_or_404(Task, id=id, user=request.user)
     if request.method == "POST":
         task.delete()
         return redirect("/tasks/")
@@ -121,7 +119,7 @@ def delete_task(request:HttpRequest, id:int):
 
 @login_required
 def delete_completed_tasks(request:HttpRequest):
-    list_completed = Task.objects.filter(completed=True)
+    list_completed = Task.objects.filter(completed=True, user=request.user)
     if list_completed:
         list_completed.delete()
     return redirect("/tasks/")
@@ -129,7 +127,7 @@ def delete_completed_tasks(request:HttpRequest):
 
 @login_required
 def switch_status_task(request:HttpRequest, id:int):
-    task = get_object_or_404(Task, id=id)
+    task = get_object_or_404(Task, id=id, user=request.user)
     task.completed = not task.completed
     task.save()
     return redirect(f"/tasks/{id}/")

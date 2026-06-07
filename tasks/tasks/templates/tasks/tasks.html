@@ -7,7 +7,10 @@
 {% block content %}
     <h3>Привет, {{ user.username }}!</h3>
     {% if tasks %}
-        <a href="/tasks/search/" class="btn">Поиск задач</a><br>
+        <a href="/tasks/search/" class="btn">Поиск задач</a>
+        <a href="/tasks/completed/" class="btn">Завершенные задачи</a>
+        <a href="/tasks/not-completed/" class="btn">Незавершенные задачи</a>
+        <br>
         <p>У вас есть следующие задачи:</p>
         {% for task in tasks %}
             <p>

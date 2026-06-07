@@ -1,22 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Info</title>
-</head>
-<body>
-    <h1>Информация о задаче "{{ task.title }}"</h1>
+{% extends "tasks/base.html" %}
+
+{% block title %}Информация о задаче{% endblock %}
+
+{% block header %}Информация о задаче "{{ task.title }}"{% endblock %}
+
+{% block content %}
     <p>Приоритет: {{ task.priority }}</p>
     <p>Статус: {% if task.completed %}Завершена{% else %}Незавершена{% endif %}</p>
+    <a href="/tasks/{{ task.id }}/edit/" class="btn">Редактировать задачу</a>
     {% if task.completed %}
-        <a href="/tasks/{{ task.id}}/switch-status/">Отметить невыполненной</a>
+        <a href="/tasks/{{ task.id}}/switch-status/" class="btn">Отметить невыполненной</a>
     {% else %}
-        <a href="/tasks/{{ task.id}}/switch-status/">Отметить выполненной</a>
+        <a href="/tasks/{{ task.id}}/switch-status/" class="btn">Отметить выполненной</a>
     {% endif %}
-    <br>
-    <a href="/tasks/{{ task.id }}/edit/">Редактировать задачу</a><br>
-    <a href="/tasks/{{ task.id }}/delete/">Удалить задачу</a><br>
-    <a href="/tasks/">Назад к списку задач</a>
-</body>
-</html>
+    <a href="/tasks/{{ task.id }}/delete/" class="btn">Удалить задачу</a>
+{% endblock %}

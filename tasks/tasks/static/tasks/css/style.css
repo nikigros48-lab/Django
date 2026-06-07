@@ -1,0 +1,35 @@
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+.btn:hover {
+    background-color: #0056b3;
+}
+.nav-links {
+        margin: 10px 0;
+        padding: 0;
+        display: flex;
+        gap: 15px;
+    }
+    .nav-links a {
+        text-decoration: none;
+        background-color: #e67e22;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: background 0.3s;
+        font-weight: 500;
+        display: inline-block;
+    }
+    .nav-links a:visited {
+        color: white;
+    }
+    .nav-links a:hover {
+        background-color: #d35400;
+        text-decoration: none;
+    }

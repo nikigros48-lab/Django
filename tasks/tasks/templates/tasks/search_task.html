@@ -1,27 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Tasks</title>
-</head>
-<body>
+{% extends "tasks/base.html" %}
+
+{% block title %}Поиск задач{% endblock %}
+
+{% block header %}Поиск задач{% endblock %}
+
+{% block content %}
     <form method="get">
-        <input type="text" name="title" placeholder="Search by title">
-        <input type="number" name="priority" placeholder="Search by priority">
+        <input type="text" name="title" placeholder="Поиск по названию">
+        <input type="number" name="priority" placeholder="Поиск по приоритету">
         <button type="submit">Найти</button>
     </form>
     {% if word or priority %}
         <p>Результаты поиска для {% if word %}"{{ word }}"{% endif %}{% if priority %} (приоритет: {{ priority }}){% endif %}:</p>
         {% if tasks %}
             {% for task in tasks %}
-                <a href="/tasks/{{ task.id }}/">{{ task.title }}</a><br>
+                <a href="/tasks/{{ task.id }}/" style="text-decoration: none; color: #2c3e50; border-bottom: 2px dotted #bdc3c7; font-size: 18px; display: inline-block; width: 200px;">{{ task.title }}</a><br>
             {% endfor %}
         {% else %}
             <p>Ничего не найдено.</p>
         {% endif %}
     {% endif %}
-    
-    
-</body>
-</html>
+{% endblock %}

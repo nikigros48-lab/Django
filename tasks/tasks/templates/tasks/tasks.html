@@ -1,17 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task List</title>
-</head>
-<body>
-    <h1>Список задач!</h1>
+{% extends "tasks/base.html" %}
+
+{% block title %}Список задач{% endblock %}
+
+{% block header %}Список задач{% endblock %}
+
+{% block content %}
+    <h3>Привет, {{ user.username }}!</h3>
     {% if tasks %}
+        <a href="/tasks/search/" class="btn">Поиск задач</a><br>
         <p>У вас есть следующие задачи:</p>
         {% for task in tasks %}
             <p>
-                {{forloop.counter}}. <a href="/tasks/{{ task.id }}/" style="text-decoration: none; color: black;">{{task.title}}</a>
+                {{forloop.counter}}. <a href="/tasks/{{ task.id }}/" style="text-decoration: none; color: #2c3e50; font-weight: 500; border-bottom: 1px dotted #bdc3c7; display: inline-block; width: 200px;">{{task.title}}</a>
                 {% if task.completed %}
                     ✅
                 {% else %}
@@ -20,11 +20,11 @@
                 ({{task.priority}})
             </p>
         {% endfor %}
+        <a href="/tasks/create/" class="btn">Создать новую задачу</a>
+        <a href="/tasks/delete-completed/" class="btn">Удалить все завершенные задачи</a><br><br>
+        <a href="/tasks/stats/" class="btn">Статистика задач</a>
     {% else %}
         <p>У вас нет задач!</p>
+        <a href="/tasks/create/" class="btn">Создать первую задачу</a>
     {% endif %}
-    <a href="/tasks/create/">Создать новую задачу</a><br>
-    <a href="/tasks/delete-completed/">Удалить все завершенные задачи</a>
-    
-</body>
-</html>
+{% endblock %}

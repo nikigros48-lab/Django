@@ -1,16 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacts</title>
-</head>
-<body>
-    <h1>Контакты</h1>
+{% extends "tasks/base.html" %}
+
+{% block title %}Контакты{% endblock %}
+
+{% block header %}Контакты{% endblock %}
+
+{% block content %}
     <p>Если у вас есть вопросы, вы можете связаться с нами:</p>
     <ul>
         <li>Email: info@taskmanager.com</li>
         <li>Телефон: +7 (123) 456-78-90</li>
     </ul>
-</body>
-</html>
+{% endblock %}

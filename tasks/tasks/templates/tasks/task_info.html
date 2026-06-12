@@ -1,4 +1,4 @@
-{% extends "tasks/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Информация о задаче{% endblock %}
 
@@ -7,11 +7,11 @@
 {% block content %}
     <p>Приоритет: {{ task.priority }}</p>
     <p>Статус: {% if task.completed %}Завершена{% else %}Незавершена{% endif %}</p>
-    <a href="/tasks/{{ task.id }}/edit/" class="btn">Редактировать задачу</a>
+    <a href="{% url 'edit_task' task.id %}" class="btn">Редактировать задачу</a>
     {% if task.completed %}
-        <a href="/tasks/{{ task.id}}/switch-status/" class="btn">Отметить невыполненной</a>
+        <a href="{% url 'switch_status_task' task.id %}" class="btn">Отметить невыполненной</a>
     {% else %}
-        <a href="/tasks/{{ task.id}}/switch-status/" class="btn">Отметить выполненной</a>
+        <a href="{% url 'switch_status_task' task.id %}" class="btn">Отметить выполненной</a>
     {% endif %}
-    <a href="/tasks/{{ task.id }}/delete/" class="btn">Удалить задачу</a>
+    <a href="{% url 'delete_task' task.id %}" class="btn">Удалить задачу</a>
 {% endblock %}

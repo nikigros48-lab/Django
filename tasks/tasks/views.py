@@ -8,8 +8,7 @@ from .models import Task
 from .forms import TaskForm
 
 
-
-def home_page(request:HttpRequest):
+def home_page(request: HttpRequest) -> HttpResponse:
     title = "Task Manager"
     description = "Это домашняя страница нашего сайта!"
     if request.user.is_authenticated:
@@ -18,58 +17,58 @@ def home_page(request:HttpRequest):
         description += " Пожалуйста, авторизуйтесь, чтобы управлять своими задачами."
         if request.method == "POST":
             if "login" in request.POST:
-                return redirect("/login/")
+                return redirect("login")
             elif "register" in request.POST:
-                return redirect("/register/")
+                return redirect("register")
     return render(request, "tasks/home.html", context={"title": title, "description": description,})
 
 
-def about(request:HttpRequest):
+def about(request:HttpRequest) -> HttpResponse:
     return render(request, "tasks/about.html")
 
 
-def contacts(request:HttpRequest):
+def contacts(request:HttpRequest) -> HttpResponse:
     return render(request, "tasks/contacts.html")
 
 
 @login_required
-def tasks(request:HttpRequest):
+def tasks(request:HttpRequest) -> HttpResponse:
     list_tasks = Task.objects.filter(user=request.user).order_by("priority")
     return render(request, "tasks/tasks.html", context={"tasks": list_tasks})
 
 
 @login_required
-def get_task(request:HttpRequest, id:int):
+def get_task(request:HttpRequest, id:int) -> HttpResponse:
     task = get_object_or_404(Task, id=id, user=request.user)
     return render(request, "tasks/task_info.html", context={"task": task})
 
 
 @login_required
-def search_task(request:HttpRequest, word:str):
+def search_task(request:HttpRequest, word:str) -> HttpResponse:
     list_tasks = Task.objects.filter(title__icontains=word, user=request.user)
     return HttpResponse(f"Задачи, содержащие '{word}':<br> {'<br>'.join({task.title for task in list_tasks})}")
 
 
 @login_required
-def longest_task(request:HttpRequest):
+def longest_task(request:HttpRequest) -> HttpResponse:
     longest_task = max(Task.objects.filter(user=request.user), key=lambda task: len(task.title))
     return HttpResponse(f"{longest_task.title} - самая длинная задача!")
 
 
 @login_required
-def completed_tasks(request:HttpRequest):
+def completed_tasks(request:HttpRequest) -> HttpResponse:
     completed = Task.objects.filter(completed=True, user=request.user)
     return HttpResponse(f"Завершенные задачи:<br> {"<br>".join(task.title for task in completed)}")
 
 
 @login_required
-def not_completed_tasks(request:HttpRequest):
+def not_completed_tasks(request:HttpRequest) -> HttpResponse:
     not_completed = Task.objects.filter(completed=False, user=request.user)
     return HttpResponse(f"Незавершенные задачи:<br> {"<br>".join(task.title for task in not_completed)}")
 
 
 @login_required
-def create_task(request:HttpRequest):
+def create_task(request:HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = TaskForm(request.POST)
         if form.is_valid():
@@ -83,20 +82,20 @@ def create_task(request:HttpRequest):
 
 
 @login_required
-def edit_task(request:HttpRequest, id:int):
+def edit_task(request:HttpRequest, id:int) -> HttpResponse:
     task = get_object_or_404(Task, id=id)
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
-            return redirect(f"/tasks/{id}/")
+            return redirect("get_task", task.id)
     else:
         form = TaskForm(instance=task)
     return render(request, "tasks/task_edit.html", context={"form": form, "task": task})
 
 
 @login_required
-def search_tasks(request:HttpRequest):
+def search_tasks(request:HttpRequest) -> HttpResponse:
     title = request.GET.get("title")
     priority = request.GET.get("priority")
     priority = int(priority) if priority else None
@@ -109,32 +108,32 @@ def search_tasks(request:HttpRequest):
 
 
 @login_required
-def delete_task(request:HttpRequest, id:int):
+def delete_task(request:HttpRequest, id:int) -> HttpResponse:
     task = get_object_or_404(Task, id=id, user=request.user)
     if request.method == "POST":
         task.delete()
-        return redirect("/tasks/")
+        return redirect("task_list")
     return render(request, "tasks/task_delete.html", context={"task": task})
 
 
 @login_required
-def delete_completed_tasks(request:HttpRequest):
+def delete_completed_tasks(request:HttpRequest) -> HttpResponse:
     list_completed = Task.objects.filter(completed=True, user=request.user)
     if list_completed:
         list_completed.delete()
-    return redirect("/tasks/")
+    return redirect("task_list")
 
 
 @login_required
-def switch_status_task(request:HttpRequest, id:int):
+def switch_status_task(request:HttpRequest, id:int) -> HttpResponse:
     task = get_object_or_404(Task, id=id, user=request.user)
     task.completed = not task.completed
     task.save()
-    return redirect(f"/tasks/{id}/")
+    return redirect("get_task", task.id)
 
 
 @login_required
-def statistics(request:HttpRequest):
+def statistics(request:HttpRequest) -> HttpResponse:
     list_tasks = Task.objects.filter(user=request.user)
     total_tasks = len(list_tasks)
     len_completed = len([task for task in list_tasks if task.completed])
@@ -142,7 +141,7 @@ def statistics(request:HttpRequest):
     return HttpResponse("<br>".join([f"Всего задач: {total_tasks}", f"Завершенных: {len_completed}", f"Незавершенных: {len_not_completed}"]))
 
 
-def login_view(request:HttpRequest):
+def login_view(request:HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -154,11 +153,11 @@ def login_view(request:HttpRequest):
     return render(request, "registration/login.html", context={"form": form})
 
 
-def logout_view(request:HttpRequest):
+def logout_view(request:HttpRequest) -> HttpResponse:
     logout(request)
-    return redirect("/")
+    return redirect("home")
 
-def register_view(request:HttpRequest):
+def register_view(request:HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():

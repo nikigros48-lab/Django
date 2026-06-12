@@ -1,4 +1,4 @@
-{% extends "tasks/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Удалить задачу{% endblock %}
 
@@ -9,6 +9,6 @@
     <form method="post">
         {% csrf_token %}
         <button type="submit">Да, удалить</button>
-        <a href="/tasks/{{ task.id }}/" style="display: inline-block; background: #f0f0f0; border: 1px solid #a0a0a0; border-radius: 0; color: #000; text-decoration: none; padding: 2px 6px; font: 13.33px Arial, sans-serif; text-align: center; cursor: default; appearance: none; -webkit-appearance: none;">Отмена</a>
+        <a href="{% url 'get_task' task.id %}" style="display: inline-block; background: #f0f0f0; border: 1px solid #a0a0a0; border-radius: 0; color: #000; text-decoration: none; padding: 2px 6px; font: 13.33px Arial, sans-serif; text-align: center; cursor: default; appearance: none; -webkit-appearance: none;">Отмена</a>
     </form>
 {% endblock %}

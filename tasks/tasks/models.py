@@ -9,6 +9,8 @@ class Task(models.Model):
     completed = models.BooleanField("Завершена", default=False)
     priority = models.IntegerField("Приоритет", default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь", related_name="tasks")
+    category = models.ForeignKey('courses.Category', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Категория")
+    tags = models.ManyToManyField('courses.Tag', blank=True, verbose_name="Теги")
 
     class Meta:
         verbose_name = "Задача"

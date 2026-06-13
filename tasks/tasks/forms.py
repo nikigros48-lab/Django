@@ -11,10 +11,11 @@ from .models import Task
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["title", "priority"]
+        fields = ["title", "priority", "category"]
         widgets = {
             "title": forms.TextInput(attrs={"placeholder": "Название задачи"}),
             "priority": forms.NumberInput(attrs={"placeholder": "Приоритет", "min": 1, "max": 3}),
+            "category": forms.Select(attrs={"placeholder": "Выберите категорию"}),
         }
         
 

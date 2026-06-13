@@ -1,34 +1,8 @@
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, logout
 from .models import Task
 from .forms import TaskForm
-
-
-def home_page(request: HttpRequest) -> HttpResponse:
-    title = "Task Manager"
-    description = "Это домашняя страница нашего сайта!"
-    if request.user.is_authenticated:
-        description += f" Привет, {request.user.username}!"
-    else:
-        description += " Пожалуйста, авторизуйтесь, чтобы управлять своими задачами."
-        if request.method == "POST":
-            if "login" in request.POST:
-                return redirect("login")
-            elif "register" in request.POST:
-                return redirect("register")
-    return render(request, "tasks/home.html", context={"title": title, "description": description,})
-
-
-def about(request:HttpRequest) -> HttpResponse:
-    return render(request, "tasks/about.html")
-
-
-def contacts(request:HttpRequest) -> HttpResponse:
-    return render(request, "tasks/contacts.html")
 
 
 @login_required
@@ -74,7 +48,7 @@ def create_task(request:HttpRequest) -> HttpResponse:
         if form.is_valid():
             task = form.save(commit=False)
             task.user = request.user
-            form.save()
+            task.save()
             return redirect("task_list")
     else:
             form = TaskForm()
@@ -83,7 +57,7 @@ def create_task(request:HttpRequest) -> HttpResponse:
 
 @login_required
 def edit_task(request:HttpRequest, id:int) -> HttpResponse:
-    task = get_object_or_404(Task, id=id)
+    task = get_object_or_404(Task, id=id, user=request.user)
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
@@ -139,31 +113,3 @@ def statistics(request:HttpRequest) -> HttpResponse:
     len_completed = len([task for task in list_tasks if task.completed])
     len_not_completed = total_tasks - len_completed
     return HttpResponse("<br>".join([f"Всего задач: {total_tasks}", f"Завершенных: {len_completed}", f"Незавершенных: {len_not_completed}"]))
-
-
-def login_view(request:HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect("task_list")
-    else:
-        form = AuthenticationForm()
-    return render(request, "registration/login.html", context={"form": form})
-
-
-def logout_view(request:HttpRequest) -> HttpResponse:
-    logout(request)
-    return redirect("home")
-
-def register_view(request:HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect("task_list")
-    else:
-        form = UserCreationForm()
-    return render(request, "registration/register.html", {'form': form})

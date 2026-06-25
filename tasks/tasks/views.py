@@ -1,32 +1,106 @@
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Task
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .models import Task, Commentary, Category, Tag
 from .forms import TaskForm
 
 
-@login_required
-def tasks(request:HttpRequest) -> HttpResponse:
-    list_tasks = Task.objects.filter(user=request.user).order_by("priority")
-    return render(request, "tasks/tasks.html", context={"tasks": list_tasks})
+class TaskListView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = "tasks/tasks.html"
+    context_object_name = "tasks"
+
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user)
 
 
-@login_required
-def get_task(request:HttpRequest, id:int) -> HttpResponse:
-    task = get_object_or_404(Task, id=id, user=request.user)
-    return render(request, "tasks/task_info.html", context={"task": task})
+class TaskDetailView(LoginRequiredMixin, DetailView):
+    model = Task
+    template_name = "tasks/task_info.html"
+    context_object_name = "task"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tags"] = self.object.tags.all()
+        context["details"] = self.object.details
+        return context
+    
+    def get_queryset(self):
+        return self.model.objects.prefetch_related("tags").select_related("details").filter(user=self.request.user)
+
+class TaskCreateView(CreateView):
+    model = Task
+    template_name = "tasks/tasks_create.html"
+    form_class = TaskForm
+    success_url = reverse_lazy("task_list")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['instance'] = Task(user=self.request.user)
+        return kwargs
+
+
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
+    model = Task
+    template_name = "tasks/task_edit.html"
+    form_class = TaskForm
+
+    def get_success_url(self):
+        return reverse_lazy("get_task", kwargs={"pk": self.object.pk})
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['description'] = self.object.details.description
+        initial['estimated_hours'] = self.object.details.estimated_hours
+        return initial
+
+
+class TaskDeleteView(LoginRequiredMixin, DeleteView):
+    model = Task
+    template_name = "tasks/task_delete.html"
+    success_url = reverse_lazy("task_list")
+
+
+class CategoryListView(LoginRequiredMixin, ListView):
+    model = Category
+    template_name = "tasks/categories.html"
+    context_object_name = "categories"
+
+
+class CategoryDetailView(LoginRequiredMixin, DetailView):
+    model = Category
+    template_name = "tasks/category_info.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category = self.object
+        context["tasks"] = Task.objects.filter(category=category, user=self.request.user)
+        return context
+
+
+class TagDetailView(LoginRequiredMixin, DetailView):
+    model = Tag
+    template_name = "tasks/tag_info.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag = self.object
+        context["tasks"] = Task.objects.filter(tags=tag, user=self.request.user)
+        return context
+
+
+def get_all_comments(request: HttpRequest, id: int) -> HttpResponse:
+    comments = Commentary.objects.filter(author=request.user)
+    pass
 
 
 @login_required
 def search_task(request:HttpRequest, word:str) -> HttpResponse:
     list_tasks = Task.objects.filter(title__icontains=word, user=request.user)
-    return HttpResponse(f"Задачи, содержащие '{word}':<br> {'<br>'.join({task.title for task in list_tasks})}")
-
-
-@login_required
-def longest_task(request:HttpRequest) -> HttpResponse:
-    longest_task = max(Task.objects.filter(user=request.user), key=lambda task: len(task.title))
-    return HttpResponse(f"{longest_task.title} - самая длинная задача!")
+    return HttpResponse(f"Задачи, содержащие '{word}':<br> {('<br>'.join({task.title for task in list_tasks}))}")
 
 
 @login_required
@@ -42,33 +116,6 @@ def not_completed_tasks(request:HttpRequest) -> HttpResponse:
 
 
 @login_required
-def create_task(request:HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            task = form.save(commit=False)
-            task.user = request.user
-            task.save()
-            return redirect("task_list")
-    else:
-            form = TaskForm()
-    return render(request, "tasks/tasks_create.html", context={"form": form})
-
-
-@login_required
-def edit_task(request:HttpRequest, id:int) -> HttpResponse:
-    task = get_object_or_404(Task, id=id, user=request.user)
-    if request.method == "POST":
-        form = TaskForm(request.POST, instance=task)
-        if form.is_valid():
-            form.save()
-            return redirect("get_task", task.id)
-    else:
-        form = TaskForm(instance=task)
-    return render(request, "tasks/task_edit.html", context={"form": form, "task": task})
-
-
-@login_required
 def search_tasks(request:HttpRequest) -> HttpResponse:
     title = request.GET.get("title")
     priority = request.GET.get("priority")
@@ -79,15 +126,6 @@ def search_tasks(request:HttpRequest) -> HttpResponse:
     if priority:
         tasks = tasks.filter(priority=priority)
     return render(request, "tasks/search_task.html", context={"tasks": tasks, "word": title, "priority": priority})
-
-
-@login_required
-def delete_task(request:HttpRequest, id:int) -> HttpResponse:
-    task = get_object_or_404(Task, id=id, user=request.user)
-    if request.method == "POST":
-        task.delete()
-        return redirect("task_list")
-    return render(request, "tasks/task_delete.html", context={"task": task})
 
 
 @login_required

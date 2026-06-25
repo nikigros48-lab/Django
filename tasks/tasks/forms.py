@@ -1,6 +1,6 @@
 from django import forms
-from .models import Task
-from courses.models import TaskDetails
+from .models import Task, TaskDetails
+
 
 class TaskForm(forms.ModelForm):
     description = forms.CharField(

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.title }}{% endblock %}
+
+{% block header %} <h1>Категория: {{ category.title }}</h1> {% endblock %}
+
+{% block content %}
+    <h2>Задачи в этой категории:</h2>
+    {% if tasks %}
+        <ul style="list-style-type: none; padding: 5px;">
+            {% for task in tasks %}
+                <li style="margin: 10px 0">{{ forloop.counter }}. <a href="{% url 'get_task' task.id %}" style="text-decoration: none; color: #2c3e50; font-weight: 500; border-bottom: 1px dotted #bdc3c7; display: inline-block; width: 200px;">{{ task.title }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>В этой категории нет задач.</p>
+    {% endif %}
+{% endblock %}

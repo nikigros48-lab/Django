@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tasks',
-    'courses',
     'info',
     'authorization',
 ]
@@ -124,4 +123,4 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-LOGIN_URL = "/login/"
+LOGIN_URL = 'login'

@@ -7,6 +7,9 @@
 {% block content %}
     <p>Приоритет: {{ task.priority }}</p>
     <p>Статус: {% if task.completed %}Завершена{% else %}Незавершена{% endif %}</p>
+    <p>Теги: {% for tag in task.tags.all %}{{ tag.title }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    <p>Описание: {{ details.description }}</p>
+    <p>Предполагаемые часы: {{ details.estimated_hours }}</p>
     <a href="{% url 'edit_task' task.id %}" class="btn">Редактировать задачу</a>
     {% if task.completed %}
         <a href="{% url 'switch_status_task' task.id %}" class="btn">Отметить невыполненной</a>

@@ -29,6 +29,9 @@
     <option name="TEMPLATE_FOLDERS">
       <list>
         <option value="$MODULE_DIR$/tasks/authorization/templates" />
+        <option value="$MODULE_DIR$/tasks/templates" />
+        <option value="$MODULE_DIR$/tasks/tasks/templates" />
+        <option value="$MODULE_DIR$/tasks/info/templates" />
       </list>
     </option>
   </component>

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Task, Commentary, Category, Tag
+from .models import Task, Category, Tag
 from .forms import TaskForm
 
 
@@ -92,9 +92,9 @@ class TagDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-def get_all_comments(request: HttpRequest, id: int) -> HttpResponse:
-    comments = Commentary.objects.filter(author=request.user)
-    pass
+# def get_all_comments(request: HttpRequest, id: int) -> HttpResponse:
+#     comments = Commentary.objects.filter(author=request.user)
+#     pass
 
 
 @login_required
@@ -120,7 +120,7 @@ def search_tasks(request:HttpRequest) -> HttpResponse:
     title = request.GET.get("title")
     priority = request.GET.get("priority")
     priority = int(priority) if priority else None
-    tasks = Task.objects.filter(user=request.user) if title or priority else []
+    tasks = Task.objects.filter(user=request.user) if title or priority else Task.objects.none()
     if title:
         tasks = tasks.filter(title__icontains=title)
     if priority:
@@ -137,8 +137,8 @@ def delete_completed_tasks(request:HttpRequest) -> HttpResponse:
 
 
 @login_required
-def switch_status_task(request:HttpRequest, id:int) -> HttpResponse:
-    task = get_object_or_404(Task, id=id, user=request.user)
+def switch_status_task(request:HttpRequest, task_id:int) -> HttpResponse:
+    task = get_object_or_404(Task, id=task_id, user=request.user)
     task.completed = not task.completed
     task.save()
     return redirect("get_task", task.id)

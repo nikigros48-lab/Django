@@ -26,12 +26,13 @@ class TaskCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ('id', 'title', 'completed', 'priority', 'priority', 'category', 'tags', 'details')
-        read_only_fields = ('id',)
+        fields = ('id', 'title', 'completed', 'priority', 'category', 'tags', 'details', 'user')
+        read_only_fields = ('id', 'user')
 
     def create(self, validated_data):
         details_data = validated_data.pop('details', None)
         tags_data = validated_data.pop('tags', [])
+        validated_data.pop('user', None)
         user = self.context['request'].user
         task = Task.objects.create(user=user, **validated_data)
 
@@ -60,7 +61,8 @@ class TaskUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ('title', 'completed', 'priority', 'category', 'tags', 'details')
+        fields = ('title', 'completed', 'priority', 'category', 'tags', 'details', 'user')
+        read_only_fields = ('id', 'user')
         extra_kwargs = {'title': {'required': False},
                         'completed': {'required': False},
                         'priority': {'required': False},
